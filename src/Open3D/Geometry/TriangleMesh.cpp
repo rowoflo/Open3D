@@ -427,7 +427,8 @@ std::shared_ptr<TriangleMesh> TriangleMesh::FilterSmoothTaubin(
 std::shared_ptr<PointCloud> TriangleMesh::SamplePointsUniformlyImpl(
         size_t number_of_points,
         std::vector<double> &triangle_areas,
-        double surface_area) const {
+        double surface_area,
+        int seed) const {
     // triangle areas to cdf
     triangle_areas[0] /= surface_area;
     for (size_t tidx = 1; tidx < triangles_.size(); ++tidx) {
@@ -438,8 +439,11 @@ std::shared_ptr<PointCloud> TriangleMesh::SamplePointsUniformlyImpl(
     // sample point cloud
     bool has_vert_normal = HasVertexNormals();
     bool has_vert_color = HasVertexColors();
-    std::random_device rd;
-    std::mt19937 mt(rd());
+    if (seed == 0) {
+      std::random_device rd;
+      seed = rd();
+    }
+    std::mt19937 mt(seed);
     std::uniform_real_distribution<double> dist(0.0, 1.0);
     auto pcd = std::make_shared<PointCloud>();
     pcd->points_.resize(number_of_points);
@@ -482,7 +486,7 @@ std::shared_ptr<PointCloud> TriangleMesh::SamplePointsUniformlyImpl(
 }
 
 std::shared_ptr<PointCloud> TriangleMesh::SamplePointsUniformly(
-        size_t number_of_points) const {
+        size_t number_of_points, int seed) const {
     if (number_of_points <= 0) {
         utility::LogError("[SamplePointsUniformly] number_of_points <= 0");
     }
@@ -496,13 +500,14 @@ std::shared_ptr<PointCloud> TriangleMesh::SamplePointsUniformly(
     double surface_area = GetSurfaceArea(triangle_areas);
 
     return SamplePointsUniformlyImpl(number_of_points, triangle_areas,
-                                     surface_area);
+                                     surface_area, seed);
 }
 
 std::shared_ptr<PointCloud> TriangleMesh::SamplePointsPoissonDisk(
         size_t number_of_points,
         double init_factor /* = 5 */,
-        const std::shared_ptr<PointCloud> pcl_init /* = nullptr */) const {
+        const std::shared_ptr<PointCloud> pcl_init /* = nullptr */,
+        int seed) const {
     if (number_of_points <= 0) {
         utility::LogError("[SamplePointsPoissonDisk] number_of_points <= 0");
     }

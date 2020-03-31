@@ -302,12 +302,14 @@ public:
     std::shared_ptr<PointCloud> SamplePointsUniformlyImpl(
             size_t number_of_points,
             std::vector<double> &triangle_areas,
-            double surface_area) const;
+            double surface_area,
+            int seed = 0) const;
 
     /// Function to sample \param number_of_points points uniformly from the
     /// mesh
     std::shared_ptr<PointCloud> SamplePointsUniformly(
-            size_t number_of_points) const;
+            size_t number_of_points,
+            int seed = 0) const;
 
     /// Function to sample \param number_of_points points (blue noise).
     /// Based on the method presented in Yuksel, "Sample Elimination for
@@ -318,7 +320,8 @@ public:
     std::shared_ptr<PointCloud> SamplePointsPoissonDisk(
             size_t number_of_points,
             double init_factor = 5,
-            const std::shared_ptr<PointCloud> pcl_init = nullptr) const;
+            const std::shared_ptr<PointCloud> pcl_init = nullptr,
+            int seed = 0) const;
 
     /// Function to subdivide triangle mesh using the simple midpoint algorithm.
     /// Each triangle is subdivided into four triangles per iteration and the
